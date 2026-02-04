@@ -8,39 +8,21 @@
   body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: #ffccd5;
+    background: linear-gradient(#ff9a9e, #fad0c4);
     overflow: hidden;
+    text-align: center;
+    color: white;
   }
 
   section {
     display: none;
     width: 100vw;
     height: 100vh;
-    text-align: center;
-    color: white;
-  }
-
-  /* ---------- INTRO SLIDES ---------- */
-  #intro {
-    display: flex;
-    align-items: center;
     justify-content: center;
-    background: black;
-  }
-
-  #intro img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    animation: fade 1s infinite;
-  }
-
-  @keyframes fade {
-    0% { opacity: 0; }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
+    align-items: center;
+    flex-direction: column;
+    padding: 40px;
+    position: relative;
   }
 
   /* ---------- MESSAGE PAGE ---------- */
@@ -48,12 +30,12 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 40px;
-    background: linear-gradient(#ff4d6d, #ff8fab);
+    align-items: center;
   }
 
   h1 {
     font-size: 3rem;
+    margin-bottom: 20px;
   }
 
   p {
@@ -64,6 +46,8 @@
 
   .buttons {
     margin-top: 40px;
+    position: relative;
+    height: 100px;
   }
 
   button {
@@ -72,45 +56,171 @@
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    position: relative;
+    position: absolute;
+    transition: transform 0.2s;
   }
 
   #yes {
     background: #fff;
     color: #ff4d6d;
+    left: 45%;
+    transform: translateX(-50%);
   }
 
   #no {
     background: #ff1f4c;
     color: white;
-    position: absolute;
+    left: 55%;
+    transform: translateX(-50%);
   }
 
   /* ---------- CELEBRATION ---------- */
   #celebrate {
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     background: radial-gradient(circle, #ff4d6d, #c9184a);
+    overflow: hidden;
+    height: 100vh;
   }
 
-  canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
+  #celebrate h1 {
+    font-size: 4rem;
+    margin-bottom: 20px;
   }
+
+  #celebrate p {
+    font-size: 2rem;
+  }
+
+  /* ---------- HEARTS ---------- */
+  .heart {
+    position: absolute;
+    font-size: 20px;
+    animation: float 5s linear infinite;
+    pointer-events: none;
+    color: rgba(255, 0, 100, 0.8);
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { transform: translateY(-200px) scale(1.2); opacity: 0.7; }
+    100% { transform: translateY(-400px) scale(0.8); opacity: 0; }
+  }
+
 </style>
 </head>
 
 <body>
 
-<!-- INTRO -->
-<section id="intro">
-  <img id="slide" src="">
-</section>
+<audio id="bgMusic" loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
 
 <!-- MESSAGE -->
 <section id="message">
   <h1>My Love 💕</h1>
   <p>
     These past 3 years with you have been the most beautiful chapter of my life.
+    Every laugh, every moment — I’d choose you again every time.
+  </p>
+
+  <h2>Will you be honored to be my Valentine once again? 💘</h2>
+
+  <div class="buttons">
+    <button id="yes">YES 💖</button>
+    <button id="no">NO</button>
+  </div>
+</section>
+
+<!-- CELEBRATION -->
+<section id="celebrate">
+  <h1>You said YES 🥹❤️</h1>
+  <p>I love you more than words can ever explain.</p>
+  <canvas id="confetti"></canvas>
+</section>
+
+<script>
+  const message = document.getElementById("message");
+  const noBtn = document.getElementById("no");
+  const yesBtn = document.getElementById("yes");
+  const celebrate = document.getElementById("celebrate");
+  const body = document.body;
+  const music = document.getElementById("bgMusic");
+
+  // Show message immediately
+  message.style.display = "flex";
+  music.play().catch(()=>{}); // play music, catch autoplay errors
+
+  // HEARTS floating on main page
+  function spawnHearts() {
+    setInterval(() => {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.fontSize = 20 + Math.random() * 30 + 'px';
+      heart.textContent = '❤️';
+      body.appendChild(heart);
+      setTimeout(() => { heart.remove(); }, 5000);
+    }, 300);
+  }
+
+  spawnHearts();
+
+  // NO button click messages
+  const messages = [
+    "Are you sure? 😏",
+    "I don't think that's a good idea 😅",
+    "Think again 😉",
+    "Maybe try YES instead 💖",
+    "Hmm… really? 🤔",
+    "I can't let you do that 😜"
+  ];
+
+  noBtn.addEventListener("click", () => {
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    alert(randomMessage);
+  });
+
+  // YES button triggers celebration with confetti
+  yesBtn.onclick = () => {
+    message.style.display = "none";
+    celebrate.style.display = "flex";
+    startConfetti();
+  };
+
+  // CONFETTI effect on YES page
+  function startConfetti() {
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const pieces = Array.from({ length: 150 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 10,
+      color: `hsl(${Math.random()*360}, 100%, 70%)`
+    }));
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        p.y += p.d;
+        if (p.y > canvas.height) p.y = 0;
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+</script>
+
+</body>
+</html>
